@@ -13,9 +13,9 @@ fun main (){
 
     val kopecks = 100
     var sumTransfer = 1000 * kopecks
-    var sumTransferMonth = 0 * kopecks
-    var cardType = "VK Pay"
-    commissionAmount(cardType, sumTransferMonth, sumTransfer)
+    var sumTransferMonth = 76000 * kopecks
+    var cardType = "MasterCard"
+    commissionAmount (cardType, sumTransferMonth, sumTransfer)
 }
 
 fun agoToText (sec: Int, timeMinuts: String, timeHours: String, min: Int, hours: Int) {
@@ -49,18 +49,32 @@ fun declinationHours (hours: Int): String {
 }
 
 fun commissionAmount (cardType: String, sumTransferMonth: Int, sumTransfer: Int){
-    var amount1 = sumTransfer * 0.6 / 100 + 2000
-    var amount2 = sumTransfer * 0.75 / 100
-
-    var amount = when (cardType) {
-        //"VK Pay" -> 0
-        cardType == "Master Card" || "Maestro" && sumTransferMonth < 7500000 -> 0
-        "Visa", "Мир" -> amount1
-        else -> 0
-
-//        cardType == "VK Pay"
-//        sumTransferMonth < 75000 -> 0
-//        sumTransferMonth > 75000 -> sumTransfer * 0,6 / 100 + 2000
+    if (cardType == "VK Pay"){
+        var limit = when {
+            sumTransfer > 15_000 * 100 -> "Максимальная сумма перевода составляет 15 000 р."
+            sumTransferMonth > 40_000 * 100 -> "Перевод отменен. Т к вы превысили лимит переводов в месяц - 40 000р."
+            else -> "Вы переводите $sumTransfer копеек. Комиссия 0 коп."
+        }
+        println(limit)
+    } else if (cardType == "MasterCard" || cardType == "Maestro"){
+        var limit = when {
+            sumTransfer > 150_000 * 100 -> "Максимальная сумма перевода составляет 150 000 р."
+            sumTransferMonth > 600_000 * 100 -> "Перевод отменен. Т к вы превысили лимит переводов в месяц - 600 000р."
+            sumTransferMonth < 75_000 * 100 -> "Вы переводите $sumTransfer копеек. Комиссия 0 коп."
+            else -> "Вы переводите $sumTransfer копеек. Комиссия " + (sumTransfer * 0.6 / 100 + 2000) + " коп."
+        }
+        println(limit)
+    } else if (cardType == "Visa" || cardType == "Мир"){
+        var amount: Double = sumTransfer * 0.75 / 100 + 2000
+        if (amount < 35 * 100) {
+            amount = 35 * 100.0
+        }
+        var limit = when {
+            sumTransfer > 150_000 * 100 -> "Максимальная сумма перевода составляет 150 000 р."
+            sumTransferMonth > 600_000 * 100 -> "Перевод отменен. Т к вы превысили лимит переводов в месяц - 600 000р."
+            amount < 35 * 100 -> "Вы переводите $sumTransfer копеек. Комиссия 3500 коп."
+            else -> "Вы переводите $sumTransfer копеек. Комиссия 0 коп."
+        }
+        println(limit)
     }
-    println("Ваша комиссия составляет: " + amount + " копеек")
 }
